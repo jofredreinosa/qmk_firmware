@@ -102,7 +102,7 @@ extern keymap_config_t keymap_config;
 #define LA_EXLM                 LSFT(KC_1)     // !
 #define LA_EXLM_INV             LSFT(KC_EQL)   // �
 #define LA_QUEST                LSFT(KC_MINS)  // ?
-#define LA_QUEST_INV            KC_EQL         // �
+#define LA_QUEST_INV            KC_EQL         // ¿
 #define LA_QUOTE                KC_MINS        // '
 #define LA_DQUO                 LSFT(KC_2)     // "
 #define LA_HASH                 LSFT(KC_3)     // #
@@ -205,7 +205,7 @@ LCTL_T(LA_LINEQ), LA_Z,   LA_X,    LA_C,    LA_V,    LA_B,                      
 
 /*
       .------------------------------------------------.                         .-------------------------------------------------.
-      |    �   |   !   |   ¡   |   #   |   $   |   %   |                         |   &   | HOME  |   UP   | END  |   ?   | BACKSPC |
+      |    �   |   !   |   ¡   |   #   |   $   |   %   |                         |   &   | HOME  |   UP   | END  |   ¿   | BACKSPC |
       |--------+-------+-------+-------+-------+-------|          _SYMB          |-------+-------+-------+-------+-------+---------|
       |    |   |   {   |   }   |   [   |   ]   |   \   |                         |       |  LEFT |  DOWN | RIGHT |       |         |
       |--------+-------+-------+-------+-------+-------|                         |-------+-------+-------+-------+-------+---------|
@@ -217,7 +217,7 @@ LCTL_T(LA_LINEQ), LA_Z,   LA_X,    LA_C,    LA_V,    LA_B,                      
 
   [_SYMB] = LAYOUT_split_3x6_3(
 //  .-----------------------------------------------------.                    .-----------------------------------------------------.
- LA_DEGREE, LA_EXLM, LA_EXLM_INV, LA_HASH, LA_DOLLAR, LA_PERC,                   LA_AMPR, LA_HOME, LA_UP,  LA_END,  LA_QUEST, LA_BSPC,
+ LA_DEGREE, LA_EXLM, LA_EXLM_INV, LA_HASH, LA_DOLLAR, LA_PERC,                   LA_AMPR, LA_HOME, LA_UP,  LA_END, LA_QUEST_INV, LA_BSPC,
 //  |--------+--------+--------+--------+--------+--------|     /* _SYMB */    |--------+--------+--------+--------+--------+--------|
    LA_PIPE, LA_LCBRC, LA_RCBRC, LA_LSBRC, LA_RSBRC, LA_BSLS,                    XXXXXXX, LA_LEFT,  LA_DOWN, LA_RIGHT, XXXXXXX, XXXXXXX,
 //  |--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
@@ -235,7 +235,7 @@ LCTL_T(LA_LINEQ), LA_Z,   LA_X,    LA_C,    LA_V,    LA_B,                      
       |--------+-------+-------+-------+-------+-------|                         |-------+-------+-------+-------+-------+---------|
       |        |       |       |       |       |       |                         |   0   |   1   |   2   |   3   |   *   |    /    |
       '---------------------------------------------------------|       |----------------------------------------------------------'
-                               |     ALT     |          | CMD   |       | SPACE |  ENTER SYMB |    ALTGR   |
+                               |     ALT     |          | CMD   |       |    0   |  ENTER SYMB |  ALTGR  |
                                '--------------------------------'       '----------------------------------'
 */
 
@@ -247,7 +247,7 @@ LCTL_T(LA_LINEQ), LA_Z,   LA_X,    LA_C,    LA_V,    LA_B,                      
 //  |--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                        LA_0,   LA_1,    LA_2,    LA_3,  LA_ASTR,  LA_SLASH,
 //  '--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------'
-                                           LA_ALT, _______, LA_LCMD,   LA_SPC,  MT(SYMB,LA_ENT), LA_ALTGR
+                                           LA_ALT, _______, LA_LCMD,   LA_0,  MT(SYMB,LA_ENT), LA_ALTGR
                                //'---------------------------------'  '--------------------------'
   ),
 
@@ -835,7 +835,7 @@ mod_state = get_mods();
             if (record->tap.count && record->event.pressed) { // si hay tap
                 if (mod_state & MOD_MASK_SHIFT) { // si SHIFT esta siendo presionado
                     del_mods(MOD_MASK_SHIFT); // desactivar SHIFT
-                    tap_code16(LA_QUEST_INV); // ?
+                    tap_code16(LA_QUEST); // ?
                     set_mods(mod_state); // volver a como estaba mod_state antes de desactivar SHIFT
                 } else { // si SHIFT no esta siendo presionado
                     tap_code16(LA_ENT); // �
