@@ -137,10 +137,18 @@ extern keymap_config_t keymap_config;
 #define LA_GRAVE                ALGR(KC_BSLS)  // ` (dead)
 #define LA_DIAER                LSFT(KC_LBRC)  // � (dead)
 
+// Definiciones de teclas específicas para Mac
+#define KC_LOPT KC_LALT  // Option izquierda (equivalente a Alt en Windows)
+#define KC_ROPT KC_RALT  // Option derecha
+#define KC_LCMD KC_LGUI  // Command izquierda (equivalente a Windows/Super en Windows)
+#define KC_RCMD KC_RGUI  // Command derecha
+
+
 // -----------------------------------------------------------------------------------------------
 
 enum corne_layers { // las capas en este keymap
-    _BASE,
+    _WIN,
+    _MAC,
     _SYMB,
     _NUMP,
     _TUNE
@@ -151,7 +159,8 @@ enum custom_keycodes { // dando nombre a las keycodes que creare
     NUMP,
     HUI,
     HUD,
-    MACROS1
+    MACROS1,
+    OS
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = { // Las keycodes en cada capa
@@ -167,14 +176,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = { // Las keycodes e
 // LSFT_T(LA_TAB) entrega tabulador con tap y simbolo ) con SHIFT y SHIFT en hold
 // LCTL_T(LA_LINEQ) entrega simbolo < con tap y simbolo > con tap y SHIFT en hold
 // LCTL_T(LA_LINEQ) actua como CONTROL en hold (estar presionado)
-// LALT_T(LA_LCMD) actua como ALT en hold y como CMD (ir a windows) con tap
 // MT(SYMB, LA_TAB) actua como SYMB en hold y como TABULADOR con tap
 // SYMB activa la capa _SYMB
 // MT(NUMP,LA_ENT) actua como NUMP en hold y como ENTER con tap
 // NUMP activa la capa _NUMP
 // ALTGR + n entrega la enhe
 // ALTGR + vocal entrega vocal con tilde
-// Tanto HUI como HUD son para cambiar el color de los LEDs en la capa _BASE
+// Tanto HUI como HUD son para cambiar el color de los LEDs en la capa _WIN
 // HUI aumenta en 5 el valor Hue de color
 // HUD disminuye en 5 el valor Hue de color
 // Este keymap debe usarse con el layout latinoamericano
@@ -182,19 +190,43 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = { // Las keycodes e
 /*
       .------------------------------------------------.                         .-------------------------------------------------.
       | ESC DEL|  Q @  |   W   |   E   |   R   |   T   |                         |   Y   |   U   |   I   |   O   |   P   | BACKSPC |
-      |--------+-------+-------+-------+-------+-------|          _BASE          |-------+-------+-------+-------+-------+---------|
-      |SFTTAB) |   A   |   S   |   D   |   F   |   G   |                         |   H   |   J   |   K   |   L   |  + *  |SFT ENT ?|
+      |--------+-------+-------+-------+-------+-------|          _MAC           |-------+-------+-------+-------+-------+---------|
+      |SFTTAB) |   A   |   S   |   D   |   F   |   G   |                         |   H   |   J   |   K   |   L   |   Ñ   |SFT ENT ?|
+      |--------+-------+-------+-------+-------+-------|                         |-------+-------+-------+-------+-------+---------|
+      |CMD < > |   Z   |   X   |   C   |   V   |   B   |                         |   N   |   M   |  , ;  |  . :  |  - _  |  '  "   |
+      '---------------------------------------------------------|       |----------------------------------------------------------'
+                               |  OPT  | TAB SYMB |     CTRL    |       | SPACE  |  ENTER NUMP |  ALTGR CAPS  |
+                               '--------------------------------'       '-------------------------------------'
+*/
+
+  [_MAC] = LAYOUT_split_3x6_3(
+//  .-----------------------------------------------------.                    .-----------------------------------------------------.
+      LA_ESC,   LA_Q,   LA_W,    LA_E,    LA_R,    LA_T,                         LA_Y,    LA_U,    LA_I,     LA_O,   LA_P,   LA_BSPC,
+//  |--------+--------+--------+--------+--------+--------|    /* _MAC */      |--------+--------+--------+--------+--------+--------|
+LSFT_T(LA_TAB), LA_A,    LA_S,    LA_D,    LA_F,    LA_G,                        LA_H,    LA_J,    LA_K,    LA_L,   LA_NTIL, RSFT_T(LA_ENT),
+//  |--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
+LGUI_T(LA_LINEQ), LA_Z,   LA_X,    LA_C,    LA_V,    LA_B,                       LA_N,    LA_M,  LA_COMM,  LA_DOT, LA_MINUS, LALT_T(LA_QUOTE),
+//  '--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------'
+                                 KC_LOPT, MT(NUMP, LA_TAB), KC_LCTL,     LA_SPC, MT(SYMB,LA_ENT), RALT_T(LA_CAPS)
+                              //'----------------------------------'  '--------------------------------'
+  ),
+
+/*
+      .------------------------------------------------.                         .-------------------------------------------------.
+      | ESC DEL|  Q @  |   W   |   E   |   R   |   T   |                         |   Y   |   U   |   I   |   O   |   P   | BACKSPC |
+      |--------+-------+-------+-------+-------+-------|          _WIN          |-------+-------+-------+-------+-------+---------|
+      |SFTTAB) |   A   |   S   |   D   |   F   |   G   |                         |   H   |   J   |   K   |   L   |   Ñ   |SFT ENT ?|
       |--------+-------+-------+-------+-------+-------|                         |-------+-------+-------+-------+-------+---------|
       |CTRL < >|   Z   |   X   |   C   |   V   |   B   |                         |   N   |   M   |  , ;  |  . :  |  - _  |  '  "   |
       '---------------------------------------------------------|       |----------------------------------------------------------'
-                               |  ALT  | TAB SYMB |     CMD     |       | SPACE |  ENTER NUMP |  ALTGR CAPS  |
-                               '--------------------------------'       '----------------------------------'
+                               |  ALT  | TAB SYMB |     CMD     |       | SPACE  |  ENTER NUMP |  ALTGR CAPS  |
+                               '--------------------------------'       '-------------------------------------'
 */
 
-  [_BASE] = LAYOUT_split_3x6_3(
+  [_WIN] = LAYOUT_split_3x6_3(
 //  .-----------------------------------------------------.                    .-----------------------------------------------------.
       LA_ESC,   LA_Q,   LA_W,    LA_E,    LA_R,    LA_T,                         LA_Y,    LA_U,    LA_I,     LA_O,   LA_P,   LA_BSPC,
-//  |--------+--------+--------+--------+--------+--------|    /* _BASE */     |--------+--------+--------+--------+--------+--------|
+//  |--------+--------+--------+--------+--------+--------|    /* _WIN */     |--------+--------+--------+--------+--------+--------|
 LSFT_T(LA_TAB), LA_A,    LA_S,    LA_D,    LA_F,    LA_G,                        LA_H,    LA_J,    LA_K,    LA_L,   LA_NTIL, RSFT_T(LA_ENT),
 //  |--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
 LCTL_T(LA_LINEQ), LA_Z,   LA_X,    LA_C,    LA_V,    LA_B,                       LA_N,    LA_M,  LA_COMM,  LA_DOT, LA_MINUS, LALT_T(LA_QUOTE),
@@ -211,7 +243,7 @@ LCTL_T(LA_LINEQ), LA_Z,   LA_X,    LA_C,    LA_V,    LA_B,                      
       |--------+-------+-------+-------+-------+-------|                         |-------+-------+-------+-------+-------+---------|
       |        |       |       |       |       |PSCREEN|                         |       |    ´  |   `   |   ¬   |   ~   |         |
       '---------------------------------------------------------|       |----------------------------------------------------------'
-                            |      ALT    | TAB SYMB |   CMD    |       | SPACE |            |   ALTGR   |
+                            |      ALT    | TAB NUMP |   CMD    |       | SPACE |   ENTER SYMB   | ALTGR |
                             '-----------------------------------'       '--------------------------------'
 */
 
@@ -235,17 +267,17 @@ LCTL_T(LA_LINEQ), LA_Z,   LA_X,    LA_C,    LA_V,    LA_B,                      
       |--------+-------+-------+-------+-------+-------|                         |-------+-------+-------+-------+-------+---------|
       |        |       |       |       |       |       |                         |   0   |   1   |   2   |   3   |   *   |    /    |
       '---------------------------------------------------------|       |----------------------------------------------------------'
-                               |     ALT     |          | CMD   |       |    0   |  ENTER SYMB |  ALTGR  |
-                               '--------------------------------'       '----------------------------------'
+                               |     ALT     | TAB NUMP | CMD   |       |    0   |  ENTER SYMB |  ALTGR  |
+                               '--------------------------------'       '--------------------------------'
 */
 
   [_NUMP] = LAYOUT_split_3x6_3(
 //  .-----------------------------------------------------.                    .-----------------------------------------------------.
      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_CALC,   LA_7,    LA_8,    LA_9,  LA_EQUAL, LA_BSPC,
 //  |--------+--------+--------+--------+--------+--------|    /* _NUMP */     |--------+--------+--------+--------+--------+--------|
-     XXXXXXX, LA_LINEQ, LA_RINEQ, LA_LPRN, LA_RPRN, LA_CIRC,                    LA_DOT,   LA_4,    LA_5,    LA_6,  LA_PLUS,  LA_MINUS,
+     XXXXXXX, LA_LINEQ, LA_RINEQ, LA_LPRN,LA_RPRN,LA_CIRC,                       LA_DOT,   LA_4,    LA_5,    LA_6,  LA_PLUS, LA_MINUS,
 //  |--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                        LA_0,   LA_1,    LA_2,    LA_3,  LA_ASTR,  LA_SLASH,
+     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                        LA_0,    LA_1,    LA_2,    LA_3,  LA_ASTR, LA_SLASH,
 //  '--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------'
                                            LA_ALT, _______, LA_LCMD,   LA_0,  MT(SYMB,LA_ENT), LA_ALTGR
                                //'---------------------------------'  '--------------------------'
@@ -255,7 +287,7 @@ LCTL_T(LA_LINEQ), LA_Z,   LA_X,    LA_C,    LA_V,    LA_B,                      
       .------------------------------------------------.                         .-------------------------------------------------.
       |   F1   |    F2 |    F3 |    F4 |   F5  |  F6   |                         |   F7  |   F8  |   F9  |  F10  |  F11  |   F12   |
       |--------+-------+-------+-------+-------+-------|          _TUNE          |-------+-------+-------+-------+-------+---------|
-      |  TOG   |  HUI  | PLAIN |BREATH | RMOOD | RSWIRL|                         |MACROS1| MUTE  | VOLD  | VOLU  |       |         |
+      |  TOG   |  HUI  | PLAIN |BREATH | RMOOD | RSWIRL|                         |MACROS1| MUTE  | VOLD  | VOLU  |  OS   |         |
       |--------+-------+-------+-------+-------+-------|                         |-------+-------+-------+-------+-------+---------|
       |        |  HUD  |       |       |       |       |                         |       |       |       |       |       |         |
       '---------------------------------------------------------|       |----------------------------------------------------------'
@@ -267,7 +299,7 @@ LCTL_T(LA_LINEQ), LA_Z,   LA_X,    LA_C,    LA_V,    LA_B,                      
 //  .-----------------------------------------------------.                    .-----------------------------------------------------.
       LA_F1,   LA_F2,   LA_F3,   LA_F4,   LA_F5,   LA_F6,                         LA_F7,  LA_F8,   LA_F9,  LA_F10,  LA_F11,   LA_F12,
 //  |--------+--------+--------+--------+--------+--------|     /* _TUNE */    |--------+--------+--------+--------+--------+--------|
-      RGB_TOG,  HUI,   RGB_M_P, RGB_M_B, RGB_M_R, RGB_M_SW,                      MACROS1, LA_MUTE, LA_VOLD, LA_VOLU, XXXXXXX, XXXXXXX,
+      RGB_TOG,  HUI,   RGB_M_P, RGB_M_B, RGB_M_R, RGB_M_SW,                      MACROS1, LA_MUTE, LA_VOLD, LA_VOLU,   OS   , XXXXXXX,
 //  |--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       XXXXXXX,  HUD,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
 //  '--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------'
@@ -313,7 +345,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     switch (biton32(state)) {
 
         case _TUNE:
-            rgblight_sethsv(HSV_WHITE); // color blanco para los LEDs en capa _TUNE
+            rgblight_sethsv(170, 255, current_val); // color blanco para los LEDs en capa _TUNE
             break;
 
         case _NUMP:
@@ -329,14 +361,27 @@ layer_state_t layer_state_set_user(layer_state_t state) {
             // un valor alto de RGBLIGHT_LIMIT_VAL puede calentar el microcontrolador (hay uno en cada mitad)
             break;
 
-        case _BASE:
+        case _WIN:
             if (host_keyboard_led_state().caps_lock) { // si CAPSLOCK (bloq mayus) esta activado
                 rgblight_sethsv(18, 255, current_val);
                 // color amarillo para los LEDs
                 // valor Hue 18 entrega color amarillo
             } else { // si CAPSLOCK (bloq mayus) no esta activado
-                rgblight_sethsv(current_hue, 255, current_val);
-                // entonces asignar este color a los LEDs para la capa _BASE
+                rgblight_sethsv(85, 255, 180);
+                // entonces asignar este color a los LEDs para la capa _WIN
+                // valor Hue current_hue el cual puede ser modificado con los keycodes HUI y HUD en la capa _TUNE
+                // HUI aumenta en 5 el valor Hue y HUD lo disminuye en 5
+            }
+            break;
+
+        case _MAC:
+            if (host_keyboard_led_state().caps_lock) { // si CAPSLOCK (bloq mayus) esta activado
+                rgblight_sethsv(18, 255, current_val);
+                // color amarillo para los LEDs
+                // valor Hue 18 entrega color amarillo
+            } else { // si CAPSLOCK (bloq mayus) no esta activado
+                rgblight_sethsv(0, 0, current_val);
+                // entonces asignar este color a los LEDs para la capa _MAC
                 // valor Hue current_hue el cual puede ser modificado con los keycodes HUI y HUD en la capa _TUNE
                 // HUI aumenta en 5 el valor Hue y HUD lo disminuye en 5
             }
@@ -405,7 +450,8 @@ static void master_logo(void) {
 }
 
 static void render_layer(void) { // esta funcion muestra las capas en el OLED y resalta la capa presente
-    oled_write_P(PSTR("BASE\n"), layer_state_is(_BASE));
+    oled_write_P(PSTR("WIN\n"), layer_state_is(_WIN));
+    oled_write_P(PSTR("MAC\n"), layer_state_is(_MAC));
     oled_write_P(PSTR("SYMB\n"), layer_state_is(_SYMB) && !layer_state_is(_TUNE));
     oled_write_P(PSTR("NUMP\n"), layer_state_is(_NUMP) && !layer_state_is(_TUNE));
     oled_write_P(PSTR("TUNE\n"), layer_state_is(_TUNE));
@@ -527,6 +573,21 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 mod_state = get_mods();
 
     switch (keycode) {
+        case OS:
+            if (record->event.pressed) {
+                // Si estamos en la capa _WIN, cambiamos a _MAC y viceversa
+                if (IS_LAYER_ON(_WIN)) {
+                    layer_off(_WIN);
+                    layer_on(_MAC);
+                } else if (IS_LAYER_ON(_MAC)) {
+                    layer_off(_MAC);
+                    layer_on(_WIN);
+                } else {
+                    // Si no estamos en ninguna de esas capas, por defecto activamos _WIN
+                    layer_on(_WIN);
+                }
+            }
+            return false;
 
         case MACROS1:
             if (record->event.pressed) {
@@ -535,9 +596,14 @@ mod_state = get_mods();
             return false;
 
         case LA_ESC:
-            if (mod_state & MOD_MASK_CTRL) { // si CONTROL esta en hold
+            if ((mod_state & MOD_MASK_CTRL & IS_LAYER_ON(_WIN)) || (mod_state & MOD_MASK_GUI & IS_LAYER_ON(_MAC))) { // si CONTROL ó CMD esta en hold
                 if (record->event.pressed) { // si LA_ESC es tapeado o presionado
-                    del_mods(MOD_MASK_CTRL); // desactivar momentaneamente CONTROL para que no interfiera con el tapeo de LA_DEL
+                    if (IS_LAYER_ON(_WIN)) {
+                        del_mods(MOD_MASK_CTRL); // desactivar momentaneamente CONTROL para Windows
+                    }
+                    if (IS_LAYER_ON(_MAC)) {
+                        del_mods(MOD_MASK_GUI); // desactivar momentaneamente COMMAND para Mac
+                    }
                     tap_code16(LA_DEL); // tap_code involucra tanto register_code como unregister_code
                     set_mods(mod_state); // volver a mod_state a como estaba antes de desactivar CONTROL
                     return false; // esto seria todo para este caso
@@ -838,7 +904,7 @@ mod_state = get_mods();
                     tap_code16(LA_QUEST); // ?
                     set_mods(mod_state); // volver a como estaba mod_state antes de desactivar SHIFT
                 } else { // si SHIFT no esta siendo presionado
-                    tap_code16(LA_ENT); // �
+                    tap_code16(LA_ENT); // hace un enter
                 }
             } else if (record->event.pressed) { // si hay hold
                 register_code16(LA_RSFT); // registrar LA_RSFT
