@@ -136,6 +136,7 @@ extern keymap_config_t keymap_config;
 #define LA_ACUTE                KC_LBRC        // � (dead)
 #define LA_GRAVE                ALGR(KC_BSLS)  // ` (dead)
 #define LA_DIAER                LSFT(KC_LBRC)  // � (dead)
+#define GRAVE                   KC_GRAVE
 
 // Definiciones de teclas específicas para Mac
 #define KC_LOPT KC_LALT  // Option izquierda (equivalente a Alt en Windows)
@@ -160,7 +161,7 @@ enum custom_keycodes { // dando nombre a las keycodes que creare
     HUI,
     HUD,
     MACROS1,
-    OS
+    OS,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = { // Las keycodes en cada capa
@@ -253,12 +254,11 @@ LCTL_T(LA_LINEQ), LA_Z,   LA_X,    LA_C,    LA_V,    LA_B,                      
 //  |--------+--------+--------+--------+--------+--------|     /* _SYMB */    |--------+--------+--------+--------+--------+--------|
    LA_PIPE, LA_LCBRC, LA_RCBRC, LA_LSBRC, LA_RSBRC, LA_BSLS,                    XXXXXXX, LA_LEFT,  LA_DOWN, LA_RIGHT, XXXXXXX, XXXXXXX,
 //  |--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  LA_PSCR,                       XXXXXXX, LA_ACUTE, LA_GRAVE, LA_NEG, LA_TILDE, XXXXXXX,
+    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  LA_PSCR,                       GRAVE  , LA_ACUTE, LA_GRAVE, LA_NEG, LA_TILDE, XXXXXXX,
 //  '--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------'
                                   LA_ALT, MT(NUMP, LA_TAB), LA_LCMD,      LA_SPC, _______, LA_ALTGR
                                     //'----------------------------'  '---------------------------------'
   ),
-
 /*
       .------------------------------------------------.                         .-------------------------------------------------.
       |        |       |       |       |       |       |                         | CALC  |   7   |   8   |   9   |   =   | BACKSPC |
@@ -596,14 +596,9 @@ mod_state = get_mods();
             return false;
 
         case LA_ESC:
-            if ((mod_state & MOD_MASK_CTRL & IS_LAYER_ON(_WIN)) || (mod_state & MOD_MASK_GUI & IS_LAYER_ON(_MAC))) { // si CONTROL ó CMD esta en hold
+            if ((mod_state & MOD_MASK_CTRL)) { // si CONTROL ó CMD esta en hold
                 if (record->event.pressed) { // si LA_ESC es tapeado o presionado
-                    if (IS_LAYER_ON(_WIN)) {
-                        del_mods(MOD_MASK_CTRL); // desactivar momentaneamente CONTROL para Windows
-                    }
-                    if (IS_LAYER_ON(_MAC)) {
-                        del_mods(MOD_MASK_GUI); // desactivar momentaneamente COMMAND para Mac
-                    }
+                    del_mods(MOD_MASK_CTRL); // desactivar momentaneamente CONTROL para Windows
                     tap_code16(LA_DEL); // tap_code involucra tanto register_code como unregister_code
                     set_mods(mod_state); // volver a mod_state a como estaba antes de desactivar CONTROL
                     return false; // esto seria todo para este caso
@@ -769,10 +764,10 @@ mod_state = get_mods();
             }
 
         case LA_I:
-            if (mod_state & MOD_MASK_CTRL) { // si CTRL esta presionado
+            if (mod_state & MOD_BIT(LA_ALTGR)) { // si ALTGR esta presionado
                 if (record->event.pressed) { // si el keycode es tapeado o holdeado
                     if (mod_state & MOD_MASK_SHIFT) { // si SHIFT esta siendo presionado
-                        del_mods(MOD_MASK_CTRL); // desactivar CTRL
+                        del_mods(LA_ALTGR); // desactivar ALTGR
                         del_mods(MOD_MASK_SHIFT); // desactivar SHIFT para que no interfiera con el tapeo de LA_ACUTE
                         tap_code16(LA_ACUTE); // Í
                         register_code(LA_LSFT); // registrar SHIFT para que la i salga mayuscula
@@ -781,7 +776,7 @@ mod_state = get_mods();
                         set_mods(mod_state); // volver a como estaba mod_state antes de desactivar CTRL
                         return false; // seria todo
                     } else { // si SHIFT no esta activado
-                        del_mods(MOD_MASK_CTRL); // desactivar CTRL
+                        del_mods(LA_ALTGR); // desactivar ALTGR
                         tap_code16(LA_ACUTE);
                         tap_code16(LA_I); // í
                         set_mods(mod_state); // volver a como estaba mod_state antes de desactivar CTRL
@@ -793,19 +788,19 @@ mod_state = get_mods();
             }
 
         case LA_O:
-            if (mod_state & MOD_MASK_CTRL) { // si CTRL esta presionado
+            if (mod_state & MOD_BIT(LA_ALTGR)) { // si ALTGR esta presionado
                 if (record->event.pressed) { // si el keycode es tapeado o holdeado
                     if (mod_state & MOD_MASK_SHIFT) { // si SHIFT esta siendo presionado
-                        del_mods(MOD_MASK_CTRL); // desactivar CTRL
+                        del_mods(LA_ALTGR); // desactivar ALTGR
                         del_mods(MOD_MASK_SHIFT); // desactivar SHIFT para que no interfiera con el tapeo de LA_ACUTE
                         tap_code16(LA_ACUTE);
                         register_code(LA_LSFT); // registrar SHIFT para mayuscula
                         tap_code16(LA_O); // Ó
                         unregister_code(LA_LSFT); // unregister SHIFT
-                        set_mods(mod_state); // volver a como estaba mod_state antes de desactivar CTRL
+                        set_mods(mod_state); // volver a como estaba mod_state antes de desactivar ALTGR
                         return false; // seria todo
                     } else { // si SHIFT no esta activado
-                        del_mods(MOD_MASK_CTRL); // desactivar CTRL
+                        del_mods(LA_ALTGR); // desactivar CTRL
                         tap_code16(LA_ACUTE);
                         tap_code16(LA_O); // ó
                         set_mods(mod_state); // volver a como estaba mod_state antes de desactivar CTRL
@@ -817,19 +812,19 @@ mod_state = get_mods();
             }
 
         case LA_U:
-            if (mod_state & MOD_MASK_CTRL) { // si CTRL esta presionado
+            if (mod_state & MOD_BIT(LA_ALTGR)) { // si ALTGR esta presionado
                 if (record->event.pressed) { // si el keycode es tapeado o holdeado
                     if (mod_state & MOD_MASK_SHIFT) { // si SHIFT esta siendo presionado
-                        del_mods(MOD_MASK_CTRL); // desactivar CTRL
+                        del_mods(LA_ALTGR); // desactivar ALTGR
                         del_mods(MOD_MASK_SHIFT); // desactivar SHIFT para que no interfiera con el tapeo de LA_ACUTE
                         tap_code16(LA_ACUTE); // �
                         register_code(LA_LSFT); // registrar SHIFT para que la u salga mayuscula
                         tap_code16(LA_U); // Ú
                         unregister_code(LA_LSFT); // unregister SHIFT
-                        set_mods(mod_state); // volver a como estaba mod_state antes de desactivar CTRL
+                        set_mods(mod_state); // volver a como estaba mod_state antes de desactivar ALTGR
                         return false; // seria todo
                     } else { // si SHIFT no esta activado
-                        del_mods(MOD_MASK_CTRL); // desactivar CTRL
+                        del_mods(LA_ALTGR); // desactivar ALTGR
                         tap_code16(LA_ACUTE);
                         tap_code16(LA_U); // ú
                         set_mods(mod_state); // volver a como estaba mod_state antes de desactivar CTRL
@@ -876,8 +871,6 @@ mod_state = get_mods();
             if (record->event.pressed) {
                 tap_code16(LA_ACUTE);
                 tap_code16(LA_SPC);
-            } else {
-                ;
             }
             return false;
 
