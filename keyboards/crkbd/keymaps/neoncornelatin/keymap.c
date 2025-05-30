@@ -162,6 +162,8 @@ enum custom_keycodes { // dando nombre a las keycodes que creare
     HUD,
     MACROS1,
     OS,
+    NUM_LT = SAFE_RANGE,
+    NUM_GT
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = { // Las keycodes en cada capa
@@ -275,7 +277,7 @@ LCTL_T(LA_LINEQ), LA_Z,   LA_X,    LA_C,    LA_V,    LA_B,                      
 //  .-----------------------------------------------------.                    .-----------------------------------------------------.
      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_CALC,   LA_7,    LA_8,    LA_9,  LA_EQUAL, LA_BSPC,
 //  |--------+--------+--------+--------+--------+--------|    /* _NUMP */     |--------+--------+--------+--------+--------+--------|
-     XXXXXXX, LA_LINEQ, LA_RINEQ, LA_LPRN,LA_RPRN,LA_CIRC,                       LA_DOT,   LA_4,    LA_5,    LA_6,  LA_PLUS, LA_MINUS,
+     XXXXXXX, NUM_LT  , NUM_GT,  LA_LPRN,LA_RPRN, LA_CIRC,                       LA_DOT,   LA_4,    LA_5,    LA_6,  LA_PLUS, LA_MINUS,
 //  |--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                        LA_0,    LA_1,    LA_2,    LA_3,  LA_ASTR, LA_SLASH,
 //  '--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------'
@@ -584,7 +586,7 @@ mod_state = get_mods();
                     layer_on(_WIN);
                 } else {
                     // Si no estamos en ninguna de esas capas, por defecto activamos _WIN
-                    layer_on(_WIN);
+                    layer_on(_MAC);
                 }
             }
             return false;
@@ -878,8 +880,6 @@ mod_state = get_mods();
             if (record->event.pressed) {
                 tap_code16(LA_GRAVE);
                 tap_code16(LA_SPC);
-            } else {
-                ;
             }
             return false;
 
@@ -906,8 +906,37 @@ mod_state = get_mods();
             }
             return false; // seria todo
 
+        case NUM_LT:
+            if (record->event.pressed && IS_LAYER_ON(_NUMP)) {
+                if (IS_LAYER_ON(_MAC)) {
+                    register_code(KC_LALT);
+                    register_code(KC_LSFT);
+                    tap_code(KC_3);
+                    unregister_code(KC_LSFT);
+                    unregister_code(KC_LALT);
+                    return false;
+                }
+                tap_code(KC_NUBS);
+                return false; // Consumimos solo cuando enviamos
+            }
+            break; // Si no cumple, salimos y permitimos comportamiento por defecto
 
-
+        case NUM_GT:
+            if (record->event.pressed && IS_LAYER_ON(_NUMP)) {
+                if (IS_LAYER_ON(_MAC)) {
+                    register_code(KC_LALT);
+                    register_code(KC_LSFT);
+                    tap_code(KC_4);
+                    unregister_code(KC_LSFT);
+                    unregister_code(KC_LALT);
+                    return false;
+                }
+                register_code(KC_LSFT);
+                tap_code(KC_NUBS);
+                unregister_code(KC_LSFT);
+                return false;
+            }
+            break;
     }
     return true;
 }
