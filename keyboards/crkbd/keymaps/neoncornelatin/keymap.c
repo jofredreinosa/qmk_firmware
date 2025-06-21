@@ -148,8 +148,8 @@ extern keymap_config_t keymap_config;
 // -----------------------------------------------------------------------------------------------
 
 enum corne_layers { // las capas en este keymap
-    _WIN,
     _MAC,
+    _WIN,
     _SYMB,
     _NUMP,
     _TUNE
@@ -163,7 +163,9 @@ enum custom_keycodes { // dando nombre a las keycodes que creare
     MACROS1,
     OS,
     NUM_LT = SAFE_RANGE,
-    NUM_GT
+    NUM_GT,
+    TEST_LT = SAFE_RANGE,
+    TEST_GT
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = { // Las keycodes en cada capa
@@ -303,7 +305,7 @@ LCTL_T(LA_LINEQ), LA_Z,   LA_X,    LA_C,    LA_V,    LA_B,                      
 //  |--------+--------+--------+--------+--------+--------|     /* _TUNE */    |--------+--------+--------+--------+--------+--------|
       RGB_TOG,  HUI,   RGB_M_P, RGB_M_B, RGB_M_R, RGB_M_SW,                      MACROS1, LA_MUTE, LA_VOLD, LA_VOLU,   OS   , XXXXXXX,
 //  |--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      XXXXXXX,  HUD,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+      XXXXXXX,  HUD,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      TEST_LT, TEST_GT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
 //  '--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------'
                                          LA_ALT, _______,  LA_LCMD,    LA_SPC, _______, LA_ALTGR
                                      //'---------------------------'  '--------------------------'
@@ -452,8 +454,8 @@ static void master_logo(void) {
 }
 
 static void render_layer(void) { // esta funcion muestra las capas en el OLED y resalta la capa presente
-    oled_write_P(PSTR("WIN\n"), layer_state_is(_WIN));
     oled_write_P(PSTR("MAC\n"), layer_state_is(_MAC));
+    oled_write_P(PSTR("WIN\n"), layer_state_is(_WIN));
     oled_write_P(PSTR("SYMB\n"), layer_state_is(_SYMB) && !layer_state_is(_TUNE));
     oled_write_P(PSTR("NUMP\n"), layer_state_is(_NUMP) && !layer_state_is(_TUNE));
     oled_write_P(PSTR("TUNE\n"), layer_state_is(_TUNE));
@@ -647,7 +649,15 @@ mod_state = get_mods();
 
         case MT(NUMP,LA_TAB):
             if (record->tap.count && record->event.pressed) { // si hay tap
-                tap_code16(LA_TAB); // tapear LA_TAB
+                if (IS_LAYER_ON(_MAC) && (get_mods() & MOD_MASK_SHIFT)) {
+                    del_mods(MOD_MASK_SHIFT);        // prevenir doble Shift
+                    register_code(KC_LSFT);
+                    tap_code(KC_TAB);
+                    unregister_code(KC_LSFT);
+                } else {
+                    // Tap normal: enviar Tab
+                    tap_code16(LA_TAB);
+                }
             } else if (record->event.pressed) { // si hay hold
                 layer_on(_NUMP); // activar capa _SYMB
                 update_tri_layer(_SYMB, _NUMP, _TUNE); // si ademas _NUMP esta activado entonces activar _TUNE
@@ -655,7 +665,7 @@ mod_state = get_mods();
                 layer_off(_NUMP); // desactivar capa _SYMB
                 update_tri_layer(_SYMB, _NUMP, _TUNE); // desactivar _TUNE
             }
-            return false; // seria todo
+        return false; // seria todo
 
         case MT(SYMB,LA_ENT):
             if (record->tap.count && record->event.pressed) {
@@ -910,9 +920,7 @@ mod_state = get_mods();
             if (record->event.pressed && IS_LAYER_ON(_NUMP)) {
                 if (IS_LAYER_ON(_MAC)) {
                     register_code(KC_LALT);
-                    register_code(KC_LSFT);
-                    tap_code(KC_3);
-                    unregister_code(KC_LSFT);
+                    tap_code(KC_COMM);
                     unregister_code(KC_LALT);
                     return false;
                 }
@@ -925,9 +933,7 @@ mod_state = get_mods();
             if (record->event.pressed && IS_LAYER_ON(_NUMP)) {
                 if (IS_LAYER_ON(_MAC)) {
                     register_code(KC_LALT);
-                    register_code(KC_LSFT);
-                    tap_code(KC_4);
-                    unregister_code(KC_LSFT);
+                    tap_code(KC_DOT);
                     unregister_code(KC_LALT);
                     return false;
                 }
@@ -937,6 +943,10 @@ mod_state = get_mods();
                 return false;
             }
             break;
+
     }
-    return true;
+
+
+    return true; // return final
+
 }
