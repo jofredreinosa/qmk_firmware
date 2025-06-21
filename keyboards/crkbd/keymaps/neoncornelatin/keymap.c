@@ -461,6 +461,7 @@ static void render_layer(void) { // esta funcion muestra las capas en el OLED y 
     oled_write_P(PSTR("TUNE\n"), layer_state_is(_TUNE));
 }
 
+
 static void render_mode(void) {
     mode_str[3] = '\0';
     mode_str[2] = '0' + mode_value % 10;
