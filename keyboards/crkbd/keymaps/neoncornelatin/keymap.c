@@ -601,16 +601,27 @@ mod_state = get_mods();
             return false;
 
         case LA_ESC:
-            if ((mod_state & MOD_MASK_CTRL)) { // si CONTROL ó CMD esta en hold
-                if (record->event.pressed) { // si LA_ESC es tapeado o presionado
-                    del_mods(MOD_MASK_CTRL); // desactivar momentaneamente CONTROL para Windows
-                    tap_code16(LA_DEL); // tap_code involucra tanto register_code como unregister_code
-                    set_mods(mod_state); // volver a mod_state a como estaba antes de desactivar CONTROL
-                    return false; // esto seria todo para este caso
+            if (IS_LAYER_ON(_WIN)) {
+                if ((mod_state & MOD_MASK_CTRL)) { // si CONTROL ó CMD esta en hold
+                    if (record->event.pressed) { // si LA_ESC es tapeado o presionado
+                        del_mods(MOD_MASK_CTRL); // desactivar momentaneamente CONTROL para Windows
+                        tap_code16(LA_DEL); // tap_code involucra tanto register_code como unregister_code
+                        set_mods(mod_state); // volver a mod_state a como estaba antes de desactivar CONTROL
+                        return false; // esto seria todo para este caso
+                    }
+                } else { // si CONTROL no esta en hold
+                    return true; // hacer lo que QMK tiene predeterminado para LA_ESC (aca se llega cuando CONTROL no esta en hold)
                 }
-            } else { // si CONTROL no esta en hold
-                return true; // hacer lo que QMK tiene predeterminado para LA_ESC (aca se llega cuando CONTROL no esta en hold)
             }
+            if (IS_LAYER_ON(_MAC)) {
+                if (mod_state & MOD_MASK_GUI) {
+                    del_mods(MOD_MASK_GUI);
+                    tap_code(KC_DEL);
+                    set_mods(mod_state);
+                    return false;
+                }
+            }
+            break;
 
         case LA_Q:
             if (get_mods() & MOD_BIT(LA_ALTGR)) { // si ALTGR esta en hold
